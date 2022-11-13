@@ -72,5 +72,6 @@ echo "   + Stop -> systemctl stop noobzvpns.service"
 echo "   + Log/Status -> systemctl status noobzvpns.service -l"
 echo "   + Enable auto-start (enabled by default) -> systemctl enable noobzvpns.service"
 echo "   + Disable auto-start -> systemctl disable noobzvpns.service"
+echo "   + Full logs -> journalctl -u noobzvpns.service"
 
 
