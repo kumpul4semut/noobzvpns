@@ -16,7 +16,7 @@ SYSTEMD=/etc/systemd/system
 SYSTEMCTL=$(which systemctl)
 
 if [ `id -u` != "0" ]; then
-    echo "Error at installation, please run installer as root user"
+    echo "Error at installation, please run installer as root"
     exit 1
 fi
 
@@ -25,22 +25,32 @@ if [ ! -d $SYSTEMD ]; then
     exit 1
 fi
 
-if [ ! -f $SYATEMCTL ]; then
+if [ ! -f $SYSTEMCTL ]; then
     echo "Error at installation, no systemctl binary found. make sure your distro using systemd as default init"
     exit 1
 fi
 
-echo "Preparing installation..."
-$SYSTEMCTL daemon-reload
-$SYSTEMCTL stop noobzvpns.service
-$SYSTEMCTL disable noobzvpns.service
-rm $SYSTEMD/noobzvpns.service
-rm $BIN/noobzvpns
-rm $CONFIGS/cert.pem
-rm $CONFIGS/key.pem
+echo "Preparing upgrade/install..."
+if [ -f $SYSTEMD/noobzvpns.service ]; then
+    $SYSTEMCTL daemon-reload
+    $SYSTEMCTL stop noobzvpns.service
+    $SYSTEMCTL disable noobzvpns.service
+    rm $SYSTEMD/noobzvpns.service
+fi
+if [ -f $BIN/noobzvpns ]; then
+    rm $BIN/noobzvpns
+fi
+if [ -f $CONFIGS/cert.pem ]; then
+    rm $CONFIGS/cert.pem
+fi
+if [ -f $CONFIGS/key.pem ]; then
+    rm $CONFIGS/key.pem
+fi
 
-echo "Copying directory and files..."
-mkdir $CONFIGS
+echo "Copying binary files..."
+if [ ! -d $CONFIGS ]; then
+    mkdir $CONFIGS
+fi
 cp noobzvpns $BIN/noobzvpns
 cp cert.pem $CONFIGS/cert.pem
 cp key.pem $CONFIGS/key.pem
@@ -49,18 +59,18 @@ if [ ! -f $CONFIGS/config.json ]; then
     cp config.json $CONFIGS/config.json
 fi
 
-echo "Setting files permission.."
+echo "Setting files permission..."
 chmod 700 $BIN/noobzvpns
 chmod 700 $CONFIGS/cert.pem
 chmod 700 $CONFIGS/config.json
 chmod 700 $CONFIGS/key.pem
 chmod 700 $SYSTEMD/noobzvpns.service
 
-echo "Finishing installation..."
+echo "Finishing upgrade/install..."
 $SYSTEMCTL daemon-reload
 $SYSTEMCTL enable noobzvpns.service
 
-echo "Installation finished."
+echo "Upgrade/Install completed."
 
 echo ""
 echo "[ NOTE ]"
